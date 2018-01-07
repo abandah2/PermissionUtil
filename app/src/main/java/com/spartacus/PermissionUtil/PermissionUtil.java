@@ -24,6 +24,7 @@ public class PermissionUtil {
     private static Context mcontext;
     private static String permissionname;
     private static String usermessage;
+    private static boolean sentToSettings = false;
 
     public static boolean shouldAskPermission() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
@@ -43,7 +44,7 @@ public class PermissionUtil {
         checkPermission(context,permission,listener,getApplicationName(context)+" "+"Need to needs your permission");
     }
 
-    public static void checkPermission(final Context context, String permission, PermissionAskListener listener, String message ) {
+    public static void checkPermission(final Context context, String permission, final PermissionAskListener listener, String message ) {
 
         PermissionUtil.usermessage =message;
         PermissionUtil.permissionname = permission;
@@ -74,6 +75,7 @@ public class PermissionUtil {
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        listener.onDenied();
                         dialog.cancel();
                     }
                 });
@@ -82,30 +84,31 @@ public class PermissionUtil {
                 //Previously Permission Request was cancelled with 'Dont Ask Again',
                 // Redirect to Settings after showing Information about why you need the permission
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Need Permission");
-                builder.setMessage("This app needs storage permission.");
+                builder.setTitle("really Need Permission");
+                builder.setMessage("This app really needs this permission.");
                 builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
-                        boolean sentToSettings = true;
+                        PermissionUtil.sentToSettings = true;
                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                         Uri uri = Uri.fromParts("package", context.getPackageName(), null);
                         intent.setData(uri);
                         ((Activity)context).startActivityForResult(intent,openSetting_requestCode);
-                        Toast.makeText(((Activity)context).getBaseContext(), "Go to Permissions to Grant Storage", Toast.LENGTH_LONG).show();
+                        Toast.makeText(((Activity)context).getBaseContext(), "Go to Permissions ", Toast.LENGTH_LONG).show();
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        listener.onDenied();
                         dialog.cancel();
                     }
                 });
                 builder.show();
             } else {
                 //just request the permission
-                ActivityCompat.requestPermissions((Activity)context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, permission_requestCode);
+                ActivityCompat.requestPermissions((Activity)context, new String[]{permission}, permission_requestCode);
             }
 
             SharedPreferences.firstTimeAskingPermission(context,permission,true);
@@ -115,14 +118,14 @@ public class PermissionUtil {
         }
     }
 
-    abstract static class PermissionAskListener implements OnResuleListener {
+    abstract static class PermissionAskListener extends OnResuleListener {
 
         @Override
         public void onRequestPermissionsResult(int requestCode, final String[] permissions, final int[] grantResults) {
             if (requestCode == permission_requestCode) {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //The External Storage Write Permission is granted to you... Continue your left job...
-                    onGranted(permissions,grantResults);
+                    onGranted();
                 } else {
                     if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)mcontext, permissionname)) {
                         //Show Information about why you need the permission
@@ -144,12 +147,12 @@ public class PermissionUtil {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
-                                onDenied(permissions,grantResults);
+                                onDenied();
                             }
                         });
                         builder.show();
                     } else {
-                        onDenied(permissions,grantResults);
+                        onDenied();
                         Toast.makeText(((Activity)mcontext).getBaseContext(),"Unable to get Permission",Toast.LENGTH_LONG).show();
                     }
                 }
@@ -168,24 +171,52 @@ public class PermissionUtil {
             onGranted(permissions, requestCode);*/
         }
 
-        void onDenied(String[] permission, int[] grantResults) {
-
-
+        @Override
+        void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+            if (requestCode == openSetting_requestCode) {
+                if (ActivityCompat.checkSelfPermission(mcontext,permissionname) == PackageManager.PERMISSION_GRANTED) {
+                    onGranted();
+                }
+            }
         }
 
-        void onGranted(String[] permissions, int[] grantResults) {
-
+        @Override
+        void onResume() {
+            super.onResume();
+            if (sentToSettings) {
+                if (ActivityCompat.checkSelfPermission(mcontext, permissionname) == PackageManager.PERMISSION_GRANTED) {
+                    //Got Permission
+                    //onGranted();
+                }else {onDenied();}
+            }
         }
 
         void AllReadyGranted() {
 
         }
+
+        void onGranted() {
+
+        }
+
+        void onDenied() {
+
+        }
     }
 
-    interface OnResuleListener {
-        void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults);
-      //   void onActivityResult(int requestCode, int resultCode, Intent data);
-      //   void onResume();
+
+    abstract static class OnResuleListener {
+        void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        }
+
+        void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        }
+
+        void onResume() {
+
+        }
     }
 
     private static int RandomInt() {
@@ -203,46 +234,11 @@ public class PermissionUtil {
         return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
     }
 
-    class Constants {
-        public final String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
-        public final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        public final String CAMERA = Manifest.permission.CAMERA;
-        public final String ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-        public final String ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-        public final String ADD_VOICEMAIL = Manifest.permission.ADD_VOICEMAIL;
-        public final String BODY_SENSORS = Manifest.permission.BODY_SENSORS;
-        public final String CALL_PHONE = Manifest.permission.CALL_PHONE;
-        public final String GET_ACCOUNTS = Manifest.permission.GET_ACCOUNTS;
-        public final String PROCESS_OUTGOING_CALLS = Manifest.permission.PROCESS_OUTGOING_CALLS;
-        public final String READ_CALENDAR = Manifest.permission.READ_CALENDAR;
-        public final String READ_CALL_LOG = Manifest.permission.READ_CALL_LOG;
-        public final String READ_CONTACTS = Manifest.permission.READ_CONTACTS;
-        public final String READ_PHONE_STATE = Manifest.permission.READ_PHONE_STATE;
-        public final String READ_SMS = Manifest.permission.READ_SMS;
-        public final String RECEIVE_MMS = Manifest.permission.RECEIVE_MMS;
-        public final String RECEIVE_SMS = Manifest.permission.RECEIVE_SMS;
-        public final String RECEIVE_WAP_PUSH = Manifest.permission.RECEIVE_WAP_PUSH;
-        public final String RECORD_AUDIO = Manifest.permission.RECORD_AUDIO;
-        public final String SEND_SMS = Manifest.permission.SEND_SMS;
-        public final String USE_SIP = Manifest.permission.USE_SIP;
-        public final String WRITE_CALENDAR = Manifest.permission.WRITE_CALENDAR;
-        public final String WRITE_CALL_LOG = Manifest.permission.WRITE_CALL_LOG;
-        public final String WRITE_CONTACTS = Manifest.permission.WRITE_CONTACTS;
-    }
+
+
 }
 
 
-class SharedPreferences {
-    private static final String PREFERENCE = "PermissionUtil";
 
-    //shared prefrnce control
-    public static boolean isFirstTimeAskingPermission(Context context, String prefKey, boolean defaultValue) {
-        return context.getSharedPreferences(PREFERENCE, Context.MODE_PRIVATE).getBoolean(prefKey, defaultValue);
-    }
 
-    public static boolean firstTimeAskingPermission(Context context, String prefKey, boolean Value) {
-        return context.getSharedPreferences(PREFERENCE, Context.MODE_PRIVATE).edit().putBoolean(prefKey, Value).commit();
-    }
-
-}
 

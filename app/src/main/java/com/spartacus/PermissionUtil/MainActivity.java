@@ -1,5 +1,6 @@
 package com.spartacus.PermissionUtil;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,21 +16,15 @@ public class MainActivity extends AppCompatActivity {
 
         PermissionUtil.checkPermission(this,android.Manifest.permission.READ_EXTERNAL_STORAGE, new PermissionUtil.PermissionAskListener() {
             @Override
-            public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                Log.e("ASDASDASD","OnResuleListener");
-            }
-
-            @Override
-            void onDenied(String[] permission, int[] requestCode) {
-                super.onDenied(permission, requestCode);
+            void onDenied() {
+                super.onDenied();
                 Log.e("ASDASDASD","onDenied");
 
             }
 
             @Override
-            void onGranted(String[] permissions, int[] requestCode) {
-                super.onGranted(permissions, requestCode);
+            void onGranted() {
+                super.onGranted();
                 Log.e("ASDASDASD","onGranted");
 
             }
@@ -37,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             void AllReadyGranted() {
                 super.AllReadyGranted();
-                Log.e("AllReadyGranted","AllReadyGranted");
+                Log.e("ASDASDASD","AllReadyGranted");
 
             }
         });
@@ -48,5 +43,17 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         PermissionUtil.onResuleListener.onRequestPermissionsResult(requestCode,permissions,grantResults);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        PermissionUtil.onResuleListener.onResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        PermissionUtil.onResuleListener.onActivityResult(requestCode,resultCode,data);
     }
 }
