@@ -6,6 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Created by Abandah on 1/7/2018.
+ *
+ */
 public class MainActivity extends AppCompatActivity {
 
     public String TAG= "ASDASDASD";

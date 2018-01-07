@@ -4,18 +4,19 @@ import android.content.Context;
 
 /**
  * Created by Abandah on 1/7/2018.
+ *
  */
-
+@SuppressWarnings("WeakerAccess")
 class SharedPreferences {
     private static final String PREFERENCE = "PermissionUtil";
 
-    //shared prefrnce control
-    public static boolean isFirstTimeAskingPermission(Context context, String prefKey, boolean defaultValue) {
-        return context.getSharedPreferences(PREFERENCE, Context.MODE_PRIVATE).getBoolean(prefKey, defaultValue);
+    @SuppressWarnings("WeakerAccess")
+    public static boolean isFirstTimeAskingPermission(Context context, String prefKey) {
+        return context.getSharedPreferences(PREFERENCE, Context.MODE_PRIVATE).getBoolean(prefKey, false);
     }
-
-    public static boolean firstTimeAskingPermission(Context context, String prefKey, boolean Value) {
-        return context.getSharedPreferences(PREFERENCE, Context.MODE_PRIVATE).edit().putBoolean(prefKey, Value).commit();
+    @SuppressWarnings("WeakerAccess")
+    public static boolean firstTimeAskingPermission(Context context, String prefKey) {
+        return context.getSharedPreferences(PREFERENCE, Context.MODE_PRIVATE).edit().putBoolean(prefKey, true).commit();
     }
 
 }

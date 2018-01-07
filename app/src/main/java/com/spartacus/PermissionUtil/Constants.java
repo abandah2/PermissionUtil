@@ -4,6 +4,7 @@ import android.Manifest;
 
 /**
  * Created by Abandah on 1/7/2018.
+ *
  */
 
 class Constants {
@@ -13,7 +14,7 @@ class Constants {
     public final String ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     public final String ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     public final String ADD_VOICEMAIL = Manifest.permission.ADD_VOICEMAIL;
-    public final String BODY_SENSORS = Manifest.permission.BODY_SENSORS;
+    //public final String BODY_SENSORS = Manifest.permission.BODY_SENSORS;
     public final String CALL_PHONE = Manifest.permission.CALL_PHONE;
     public final String GET_ACCOUNTS = Manifest.permission.GET_ACCOUNTS;
     public final String PROCESS_OUTGOING_CALLS = Manifest.permission.PROCESS_OUTGOING_CALLS;

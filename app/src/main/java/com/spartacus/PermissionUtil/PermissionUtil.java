@@ -12,10 +12,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Random;
 
+/**
+ * Created by Abandah on 1/7/2018.
+ *
+ */
 public class PermissionUtil {
 
     @SuppressWarnings("WeakerAccess")
@@ -86,7 +91,7 @@ public class PermissionUtil {
                     }
                 });
                 builder.show();
-            } else if (SharedPreferences.isFirstTimeAskingPermission(context, permission, false)) {
+            } else if (SharedPreferences.isFirstTimeAskingPermission(context, permission)) {
                 //Previously Permission Request was cancelled with 'Dont Ask Again',
                 // Redirect to Settings after showing Information about why you need the permission
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -117,7 +122,8 @@ public class PermissionUtil {
                 ActivityCompat.requestPermissions((Activity) context, new String[]{permission}, permission_requestCode);
             }
 
-            SharedPreferences.firstTimeAskingPermission(context, permission, true);
+            boolean firsttime =SharedPreferences.firstTimeAskingPermission(context, permission);
+            Log.e("first time ",firsttime+"");
 
         } else {
             listener.AllReadyGranted();
