@@ -7,8 +7,7 @@ import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
+    public String TAG= "ASDASDASD";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,22 +15,22 @@ public class MainActivity extends AppCompatActivity {
 
         PermissionUtil.checkPermission(this,android.Manifest.permission.READ_EXTERNAL_STORAGE, new PermissionUtil.PermissionAskListener() {
             @Override
-            public void OnActivityResuleListener(int requestCode, String[] permissions, int[] grantResults) {
-                super.OnActivityResuleListener(requestCode, permissions, grantResults);
-                Log.e("HHHHHH","FFFFFFFFF");
+            public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                Log.e("ASDASDASD","OnResuleListener");
             }
 
             @Override
-            void onDenied(String permission, int requestCode) {
+            void onDenied(String[] permission, int[] requestCode) {
                 super.onDenied(permission, requestCode);
-                Log.e("onDenied","onDenied");
+                Log.e("ASDASDASD","onDenied");
 
             }
 
             @Override
-            void onGranted(String[] permissions, int requestCode) {
+            void onGranted(String[] permissions, int[] requestCode) {
                 super.onGranted(permissions, requestCode);
-                Log.e("onGranted","onGranted");
+                Log.e("ASDASDASD","onGranted");
 
             }
 
@@ -48,6 +47,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        PermissionUtil.onActivityResuleListener.OnActivityResuleListener(requestCode,permissions,grantResults);
+        PermissionUtil.onResuleListener.onRequestPermissionsResult(requestCode,permissions,grantResults);
     }
 }
