@@ -18,15 +18,18 @@ import java.util.Random;
 
 public class PermissionUtil {
 
+    @SuppressWarnings("WeakerAccess")
     public static OnResuleListener onResuleListener;
+
+
     private static int permission_requestCode;
     private static int openSetting_requestCode;
-    private static Context mcontext;
+    //private static Context mcontext;
     private static String permissionname;
     private static String usermessage;
     private static boolean sentToSettings = false;
 
-    public static boolean shouldAskPermission() {
+    private static boolean shouldAskPermission() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
     }
 
@@ -40,26 +43,28 @@ public class PermissionUtil {
         return false;
     }
 
+
+    @SuppressWarnings("WeakerAccess")
     public static void checkPermission(Context context, String permission, PermissionAskListener listener) {
-        checkPermission(context,permission,listener,getApplicationName(context)+" "+"Need to needs your permission");
+        checkPermission(context, permission, listener, RegMethods.getApplicationName(context) + " " + "Need to needs your permission");
     }
 
-    public static void checkPermission(final Context context, String permission, final PermissionAskListener listener, String message ) {
+    @SuppressWarnings("WeakerAccess")
+    public static void checkPermission(final Context context, String permission, final PermissionAskListener listener, String message) {
 
-        PermissionUtil.usermessage =message;
+        PermissionUtil.usermessage = message;
         PermissionUtil.permissionname = permission;
-        mcontext = context;
+        //mcontext = context;
         onResuleListener = listener;
-        permission_requestCode = RandomInt();
-        openSetting_requestCode = RandomInt();
-        while (permission_requestCode==openSetting_requestCode)
-        {
-            openSetting_requestCode=RandomInt();
+        permission_requestCode = RegMethods.RandomInt();
+        openSetting_requestCode = RegMethods.RandomInt();
+        while (permission_requestCode == openSetting_requestCode) {
+            openSetting_requestCode = RegMethods.RandomInt();
         }
 
 
         if (shouldAskPermission(context, permission)) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)context, permission)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, permission)) {
                 //Show Information about why you need the permission
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Need Permission");
@@ -68,9 +73,10 @@ public class PermissionUtil {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
-                        ActivityCompat.requestPermissions((Activity) mcontext,
+                        ActivityCompat.requestPermissions((Activity) context,
                                 new String[]{permissionname},
-                                permission_requestCode);                    }
+                                permission_requestCode);
+                    }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
@@ -80,7 +86,7 @@ public class PermissionUtil {
                     }
                 });
                 builder.show();
-            } else if (SharedPreferences.isFirstTimeAskingPermission(context,permission,false)) {
+            } else if (SharedPreferences.isFirstTimeAskingPermission(context, permission, false)) {
                 //Previously Permission Request was cancelled with 'Dont Ask Again',
                 // Redirect to Settings after showing Information about why you need the permission
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -94,8 +100,8 @@ public class PermissionUtil {
                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                         Uri uri = Uri.fromParts("package", context.getPackageName(), null);
                         intent.setData(uri);
-                        ((Activity)context).startActivityForResult(intent,openSetting_requestCode);
-                        Toast.makeText(((Activity)context).getBaseContext(), "Go to Permissions ", Toast.LENGTH_LONG).show();
+                        ((Activity) context).startActivityForResult(intent, openSetting_requestCode);
+                        Toast.makeText(((Activity) context).getBaseContext(), "Go to Permissions ", Toast.LENGTH_LONG).show();
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -108,10 +114,10 @@ public class PermissionUtil {
                 builder.show();
             } else {
                 //just request the permission
-                ActivityCompat.requestPermissions((Activity)context, new String[]{permission}, permission_requestCode);
+                ActivityCompat.requestPermissions((Activity) context, new String[]{permission}, permission_requestCode);
             }
 
-            SharedPreferences.firstTimeAskingPermission(context,permission,true);
+            SharedPreferences.firstTimeAskingPermission(context, permission, true);
 
         } else {
             listener.AllReadyGranted();
@@ -121,15 +127,15 @@ public class PermissionUtil {
     abstract static class PermissionAskListener extends OnResuleListener {
 
         @Override
-        public void onRequestPermissionsResult(int requestCode, final String[] permissions, final int[] grantResults) {
+        public void onRequestPermissionsResult(final Context context, int requestCode, final String[] permissions, final int[] grantResults) {
             if (requestCode == permission_requestCode) {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //The External Storage Write Permission is granted to you... Continue your left job...
                     onGranted();
                 } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)mcontext, permissionname)) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, permissionname)) {
                         //Show Information about why you need the permission
-                        AlertDialog.Builder builder = new AlertDialog.Builder((Activity)mcontext);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle("Need Permission");
                         builder.setMessage(usermessage);
                         builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
@@ -138,7 +144,7 @@ public class PermissionUtil {
                                 dialog.cancel();
 
 
-                                ActivityCompat.requestPermissions((Activity)mcontext, new String[]{permissionname}, permission_requestCode);
+                                ActivityCompat.requestPermissions((Activity) context, new String[]{permissionname}, permission_requestCode);
 
 
                             }
@@ -153,7 +159,7 @@ public class PermissionUtil {
                         builder.show();
                     } else {
                         onDenied();
-                        Toast.makeText(((Activity)mcontext).getBaseContext(),"Unable to get Permission",Toast.LENGTH_LONG).show();
+                        Toast.makeText(((Activity) context).getBaseContext(), "Unable to get Permission", Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -172,23 +178,22 @@ public class PermissionUtil {
         }
 
         @Override
-        void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
+        void onActivityResult(Context context, int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(context, requestCode, resultCode, data);
             if (requestCode == openSetting_requestCode) {
-                if (ActivityCompat.checkSelfPermission(mcontext,permissionname) == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(context, permissionname) == PackageManager.PERMISSION_GRANTED) {
                     onGranted();
                 }
             }
         }
 
         @Override
-        void onResume() {
-            super.onResume();
+        void onResume(Context context) {
+            super.onResume(context);
             if (sentToSettings) {
-                if (ActivityCompat.checkSelfPermission(mcontext, permissionname) == PackageManager.PERMISSION_GRANTED) {
-                    //Got Permission
-                    //onGranted();
-                }else {onDenied();}
+                if (ActivityCompat.checkSelfPermission(context, permissionname) != PackageManager.PERMISSION_GRANTED) {
+                    onDenied();
+                }
             }
         }
 
@@ -205,35 +210,18 @@ public class PermissionUtil {
         }
     }
 
-
     abstract static class OnResuleListener {
-        void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        void onRequestPermissionsResult(Context context, int requestCode, String[] permissions, int[] grantResults) {
         }
 
-        void onActivityResult(int requestCode, int resultCode, Intent data) {
+        void onActivityResult(Context context, int requestCode, int resultCode, Intent data) {
 
         }
 
-        void onResume() {
+        void onResume(Context context) {
 
         }
     }
-
-    private static int RandomInt() {
-        int min = 0;
-        int max = 500;
-
-        Random r = new Random();
-        return r.nextInt(max - min + 1) + min;
-
-    }
-
-    private static String getApplicationName(Context context) {
-        ApplicationInfo applicationInfo = context.getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
-    }
-
 
 
 }
