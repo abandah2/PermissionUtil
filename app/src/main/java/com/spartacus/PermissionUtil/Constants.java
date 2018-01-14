@@ -7,7 +7,7 @@ import android.Manifest;
  *
  */
 
-class Constants {
+public class Constants {
     public final String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     public final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     public final String CAMERA = Manifest.permission.CAMERA;

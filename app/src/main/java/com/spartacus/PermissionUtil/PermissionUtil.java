@@ -1,12 +1,10 @@
 package com.spartacus.PermissionUtil;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -15,16 +13,13 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.util.Random;
-
 /**
  * Created by Abandah on 1/7/2018.
- *
  */
 public class PermissionUtil {
 
     @SuppressWarnings("WeakerAccess")
-    public static OnResuleListener onResuleListener;
+    public static OnResuleListener onResuleListener = null;
 
 
     private static int permission_requestCode;
@@ -51,7 +46,8 @@ public class PermissionUtil {
 
     @SuppressWarnings("WeakerAccess")
     public static void checkPermission(Context context, String permission, PermissionAskListener listener) {
-        checkPermission(context, permission, listener, RegMethods.getApplicationName(context) + " " + "Need to needs your permission");
+        String[] per = permission.split("\\.");
+        checkPermission(context, permission, listener, RegMethods.getApplicationName(context) + " " + "Need your permission to Use " + per[per.length - 1]);
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -122,15 +118,15 @@ public class PermissionUtil {
                 ActivityCompat.requestPermissions((Activity) context, new String[]{permission}, permission_requestCode);
             }
 
-            boolean firsttime =SharedPreferences.firstTimeAskingPermission(context, permission);
-            Log.e("first time ",firsttime+"");
+            boolean firsttime = SharedPreferences.firstTimeAskingPermission(context, permission);
+            Log.e("first time ", firsttime + "");
 
         } else {
             listener.AllReadyGranted();
         }
     }
 
-    abstract static class PermissionAskListener extends OnResuleListener {
+    public abstract static class PermissionAskListener extends OnResuleListener {
 
         @Override
         public void onRequestPermissionsResult(final Context context, int requestCode, final String[] permissions, final int[] grantResults) {
@@ -184,7 +180,7 @@ public class PermissionUtil {
         }
 
         @Override
-        void onActivityResult(Context context, int requestCode, int resultCode, Intent data) {
+        public void onActivityResult(Context context, int requestCode, int resultCode, Intent data) {
             super.onActivityResult(context, requestCode, resultCode, data);
             if (requestCode == openSetting_requestCode) {
                 if (ActivityCompat.checkSelfPermission(context, permissionname) == PackageManager.PERMISSION_GRANTED) {
@@ -194,7 +190,7 @@ public class PermissionUtil {
         }
 
         @Override
-        void onResume(Context context) {
+        public void onResume(Context context) {
             super.onResume(context);
             if (sentToSettings) {
                 if (ActivityCompat.checkSelfPermission(context, permissionname) != PackageManager.PERMISSION_GRANTED) {
@@ -203,28 +199,29 @@ public class PermissionUtil {
             }
         }
 
-        void AllReadyGranted() {
+        public void AllReadyGranted() {
 
         }
 
-        void onGranted() {
+
+        public void onGranted() {
 
         }
 
-        void onDenied() {
+        public void onDenied() {
 
         }
     }
 
-    abstract static class OnResuleListener {
-        void onRequestPermissionsResult(Context context, int requestCode, String[] permissions, int[] grantResults) {
+    public abstract static class OnResuleListener {
+        public void onRequestPermissionsResult(Context context, int requestCode, String[] permissions, int[] grantResults) {
         }
 
-        void onActivityResult(Context context, int requestCode, int resultCode, Intent data) {
+        public void onActivityResult(Context context, int requestCode, int resultCode, Intent data) {
 
         }
 
-        void onResume(Context context) {
+        public void onResume(Context context) {
 
         }
     }
