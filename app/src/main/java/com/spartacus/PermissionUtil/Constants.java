@@ -8,7 +8,7 @@ import android.Manifest;
  */
 
 public class Constants {
-    public final String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
+    public final static String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     public final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     public final String CAMERA = Manifest.permission.CAMERA;
     public final String ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
