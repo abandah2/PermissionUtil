@@ -11,7 +11,6 @@ import java.util.Random;
  */
 @SuppressWarnings("WeakerAccess")
 public class RegMethods {
-    @SuppressWarnings("WeakerAccess")
     public static int RandomInt() {
         int min = 0;
         int max = 500;
@@ -20,7 +19,6 @@ public class RegMethods {
         return r.nextInt(max - min + 1) + min;
 
     }
-    @SuppressWarnings("WeakerAccess")
     public static String getApplicationName(Context context) {
         ApplicationInfo applicationInfo = context.getApplicationInfo();
         int stringId = applicationInfo.labelRes;
